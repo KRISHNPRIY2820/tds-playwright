@@ -1,32 +1,46 @@
-import { chromium } from "playwright";
+const { chromium } = require("playwright");
 
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage();
+async function main() {
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage();
 
-let total = 0;
+  let grandTotal = 0;
 
-for (let seed = 0; seed <= 9; seed++) {
+  for (let seed = 0; seed <= 9; seed++) {
     const url = `https://sanand0.github.io/tdsdata/js_table/?seed=${seed}`;
 
-    console.log(`Opening ${url}`);
+    console.log(`\nOpening seed ${seed}: ${url}`);
 
-    await page.goto(url, {
-        waitUntil: "networkidle"
-    });
+    await page.goto(url, { waitUntil: "networkidle" });
 
-    const numbers = await page.$$eval("table td", cells =>
-        cells.map(cell => cell.innerText)
-    );
+    // Wait until at least one table cell appears after JavaScript renders the page.
+    await page.locator("table td").first().waitFor();
 
-    for (const value of numbers) {
-        const n = Number(value);
-        if (!isNaN(n))
-            total += n;
+    const cellTexts = await page.locator("table td").allTextContents();
+
+    let pageTotal = 0;
+
+    for (const text of cellTexts) {
+      // Finds integers and decimals, including negative numbers.
+      const numbers = text.match(/-?\d+(?:\.\d+)?/g) || [];
+
+      for (const value of numbers) {
+        pageTotal += Number(value);
+      }
     }
+
+    grandTotal += pageTotal;
+    console.log(`SEED_${seed}_TOTAL=${pageTotal}`);
+  }
+
+  console.log("\n====================================");
+  console.log(`FINAL_TABLE_SUM=${grandTotal}`);
+  console.log("====================================");
+
+  await browser.close();
 }
 
-console.log("==========================");
-console.log("TOTAL =", total);
-console.log("==========================");
-
-await browser.close();
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
