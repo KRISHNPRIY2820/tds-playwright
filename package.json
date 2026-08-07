@@ -1,11 +1,11 @@
 {
-  "name": "tds-playwright",
+  "name": "playwright-table-sums",
   "version": "1.0.0",
-  "type": "module",
+  "private": true,
   "scripts": {
-    "start": "node scrape.js"
+    "scrape": "node scrape.js"
   },
-  "dependencies": {
-    "playwright": "^1.54.2"
+  "devDependencies": {
+    "playwright": "^1.55.0"
   }
 }
