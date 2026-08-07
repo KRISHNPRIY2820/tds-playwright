@@ -1,0 +1,26 @@
+name: Playwright QA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scrape:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install packages
+        run: npm install
+
+      - name: Install browsers
+        run: npx playwright install --with-deps
+
+      - name: 23f2002323@ds.study.iitm.ac.in
+        run: node scrape.js
